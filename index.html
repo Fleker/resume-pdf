@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nick Felker - Interactive AI Resume</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .a4-sheet {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            margin: 2rem auto;
+            background: white;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            position: relative;
+        }
+        .toggleable {
+            cursor: pointer;
+            transition: opacity 0.3s ease-in-out;
+            border-radius: 4px;
+            padding: 2px;
+        }
+        .toggleable:hover {
+            background-color: #e5e7eb;
+        }
+        .toggled-off {
+            opacity: 0.3;
+        }
+        .gemini-btn {
+            background-color: #f0f4f8;
+            color: #4a5568;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border: 1px solid #e2e8f0;
+        }
+        .gemini-btn:hover {
+            background-color: #e2e8f0;
+            transform: translateY(-1px);
+        }
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @media print {
+            body { background-color: white; margin: 0; padding: 0; }
+            .a4-sheet { width: 100%; min-height: 0; margin: 0; box-shadow: none; padding: 15mm; }
+            .toggled-off, .print-button, .gemini-controls { display: none !important; }
+            .toggleable:hover { background-color: transparent; }
+        }
+        @page { size: A4; margin: 0; }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="a4-sheet" id="resume-container">
+        <!-- Resume content will be injected here -->
+    </div>
+
+    <div class="text-center my-8 print-button">
+        <button onclick="window.print()" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 transition-colors">
+            Print to PDF
+        </button>
+    </div>
+
+    <!-- Gemini Modal -->
+    <div id="gemini-modal" class="modal-backdrop hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modal-title" class="text-xl font-bold">AI Assistant</h3>
+                <button onclick="hideModal()" class="text-gray-500 hover:text-gray-800">&times;</button>
+            </div>
+            <div id="modal-body">
+                <!-- Content will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA ---
+        const resumeData = {
+            "header": {
+                "name": "NICK FELKER",
+                "title": "Software Engineer",
+                "contact": [
+                    { "type": "phone", "value": "(856) 347-0772", "icon": "phone" },
+                    { "type": "location", "value": "New York, NY", "icon": "map-pin" },
+                    { "type": "linkedin", "value": "https://linkedin.com/in/nickfelker", "display": "linkedin.com/in/nickfelker", "icon": "linkedin" },
+                    { "type": "website", "value": "https://felker.dev", "display": "felker.dev", "icon": "globe" },
+                    { "type": "email", "value": "nickfelker@gmail.com", "display": "@nickfelker@gmail.com", "icon": "mail" },
+                    { "type": "github", "value": "https://github.com/fleker", "display": "github.com/fleker", "icon": "github" }
+                ]
+            },
+            "sections": [
+                {
+                    "title": "WORK EXPERIENCE",
+                    "items": [
+                        { "title": "Software Engineer, Shopping", "organization": "Google", "date": "November 2021 - Present", "location": "New York, NY", "points": ["Built platform to streamline API transformations with AI", "Relaunched Shopify integration which tripled positive merchant sentiment"], "tags": ["AI", "Angular", "Golang", "eCommerce"] },
+                        { "title": "Assistant DevRel", "organization": "Google", "date": "January 2019 - November 2021", "location": "New York, NY", "points": ["Managed summer interns to build new tooling for smart home platform", "Developed and released Chrome Extension for developer productivity"], "tags": ["Smart Home", "IoT", "DevRel", "Management"] },
+                        { "title": "Voice Technology", "organization": "Google", "date": "June 2017 - January 2019", "location": "Mountain View, CA", "points": ["Built samples, contributed to API of Android Things & Assistant SDK platforms", "Attended external corporate workshops and assisted interested developers"], "tags": ["Embedded Software Design", "AI", "Voice Technology", "Node.js"] }
+                    ]
+                },
+                {
+                    "title": "EDUCATION",
+                    "items": [
+                        { "title": "Masters in Electrical & Computer Engineering", "organization": "Rowan University", "date": "September 2019 - May 2024", "location": "Glassboro, NJ", "points": ["Published thesis Design and Implementation of Truly Random Number Generation using Memristors for In-Memory Computing"] },
+                        { "title": "Bachelor in Electrical & Computer Engineering, Minor in Computer Science", "organization": "Rowan University", "date": "May 2017", "location": "Glassboro, NJ", "points": [] }
+                    ]
+                },
+                { "title": "PROJECTS", "items": [ /* ... project data ... */ ] },
+                {
+                    "title": "ACHIEVEMENTS",
+                    "items": [
+                        { "title": "First Place at PennApps", "points": ["Part of a team that developed skin-safe tattoo capacitive touch sensors, winning first place at world's largest univerisity hackathon."], "icon": "award" },
+                        { "title": "Best Design Award", "points": ["Built nutrition check-in Android app with ML-based camera scanner"], "icon": "layout-template" },
+                        { "title": "Eagle Scout", "icon": "life-buoy" },
+                        { "title": "Intellectual Property Award", "points": ["Filed ten defensive publications on machine learning applications"], "icon": "lightbulb" }
+                    ]
+                },
+                { "title": "SKILLS", "items": [ /* ... skills data ... */ ] },
+                { "title": "EXTRACURRICULARS", "items": [ /* ... extracurriculars data ... */ ] }
+            ]
+        };
+
+        // --- RENDER FUNCTION ---
+        function renderResume() {
+            const container = document.getElementById('resume-container');
+            let html = '';
+
+            const header = resumeData.header;
+            html += `
+                <header class="text-center mb-8 toggleable">
+                    <h1 class="text-4xl font-bold tracking-wider">${header.name}</h1>
+                    <p class="text-xl text-gray-600">${header.title}</p>
+                    <div class="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4 text-sm text-blue-600">
+                        ${header.contact.map(c => `
+                            <a href="${c.type === 'email' ? 'mailto:' : ''}${c.value}" target="_blank" class="hover:underline toggleable flex items-center gap-1.5">
+                                <i data-lucide="${c.icon}" class="w-4 h-4"></i>
+                                <span>${c.display || c.value}</span>
+                            </a>
+                        `).join('')}
+                    </div>
+                </header>`;
+
+            html += '<div class="grid grid-cols-3 gap-x-12">';
+            html += '<div class="col-span-2">';
+
+            resumeData.sections.slice(0, 3).forEach(section => {
+                const sectionId = `section-content-${section.title.replace(/\s+/g, '-')}`;
+                html += `<section class="mb-6 toggleable">
+                    <div class="flex justify-between items-center border-b-2 border-gray-800 pb-1 mb-3">
+                        <h2 class="text-lg font-bold">${section.title}</h2>
+                    </div>
+                    <div id="${sectionId}">
+                        ${section.items.map(item => `
+                            <div class="mb-4 toggleable">
+                                <div class="flex justify-between items-baseline">
+                                    <h3 class="font-semibold text-md">${item.title}</h3>
+                                    ${item.date ? `<p class="text-sm text-gray-600 flex items-center gap-1.5"><i data-lucide="calendar-days" class="w-3.5 h-3.5"></i>${item.date}</p>` : ''}
+                                </div>
+                                <div class="flex justify-between items-baseline">
+                                    <p class="text-md font-medium text-gray-700">${item.organization || ''}</p>
+                                    ${item.location ? `<p class="text-sm text-gray-600 flex items-center gap-1.5"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i>${item.location}</p>` : ''}
+                                </div>
+                                ${item.points && item.points.length > 0 ? `<ul class="list-disc list-inside mt-1 text-sm text-gray-700 space-y-1">${item.points.map(point => `<li class="toggleable">${point}</li>`).join('')}</ul>` : ''}
+                                ${item.tags && item.tags.length > 0 ? `<div class="flex flex-wrap gap-2 mt-2">${item.tags.map(tag => `<span class="bg-gray-200 text-gray-800 text-xs font-semibold px-2.5 py-0.5 rounded-full toggleable">${tag}</span>`).join('')}</div>` : ''}
+                            </div>`).join('')}
+                    </div>
+                </section>`;
+            });
+            html += '</div>';
+
+            html += '<div class="col-span-1">';
+            resumeData.sections.slice(3).forEach(section => {
+                 const sectionId = `section-content-${section.title.replace(/\s+/g, '-')}`;
+                 html += `<section class="mb-6 toggleable">
+                    <div class="flex justify-between items-center border-b-2 border-gray-800 pb-1 mb-3">
+                        <h2 class="text-lg font-bold">${section.title}</h2>
+                    </div>
+                    <div id="${sectionId}">
+                        ${section.items.map(item => `
+                            <div class="mb-3 toggleable">
+                                <h3 class="font-semibold text-md flex items-center gap-2">${item.icon ? `<i data-lucide="${item.icon}" class="w-4 h-4 text-blue-600"></i>` : ''}${item.title}</h3>
+                                ${item.points && item.points.length > 0 ? `<p class="text-sm text-gray-700 pl-6">${item.points.map(point => `<span class="toggleable">${point}</span>`).join('')}</p>` : ''}
+                            </div>`).join('')}
+                    </div>
+                </section>`;
+            });
+            html += '</div></div>';
+
+            container.innerHTML = html;
+            lucide.createIcons();
+        }
+
+        // --- TOGGLE & MODAL LOGIC ---
+        document.addEventListener('click', e => {
+            const target = e.target.closest('.toggleable');
+            if (target && !e.target.closest('.gemini-controls, a')) {
+                e.stopPropagation();
+                target.classList.toggle('toggled-off');
+            }
+        });
+
+        function showModal(title) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('gemini-modal').classList.remove('hidden');
+        }
+
+        function hideModal() {
+            document.getElementById('gemini-modal').classList.add('hidden');
+            document.getElementById('modal-body').innerHTML = '';
+        }
+
+        function showLoader() {
+            document.getElementById('modal-body').innerHTML = '<div class="modal-loader"></div>';
+        }
+
+        // --- GEMINI API CALL ---
+        async function callGemini(promptPrefix, elementId, mode) {
+            const targetElement = document.getElementById(elementId);
+            if (!targetElement) return;
+
+            const content = targetElement.innerText;
+            const fullPrompt = `${promptPrefix}\n\n---\n\n${content}`;
+            
+            showModal(mode === 'rewrite' ? 'Rewriting Content...' : 'Summarizing...');
+            showLoader();
+
+            try {
+                let chatHistory = [{ role: "user", parts: [{ text: fullPrompt }] }];
+                const payload = { contents: chatHistory };
+                const apiKey = ""; // API key will be injected by the environment
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    displayGeminiResult(text, elementId, mode);
+                } else {
+                    throw new Error("Invalid response from API.");
+                }
+
+            } catch (error) {
+                console.error("Gemini API call failed:", error);
+                document.getElementById('modal-body').innerHTML = `<p class="text-red-500">Sorry, something went wrong. Please try again.</p><p class="text-xs text-gray-500 mt-2">${error.message}</p>`;
+            }
+        }
+
+        function displayGeminiResult(text, elementId, mode) {
+            document.getElementById('modal-title').innerText = mode === 'rewrite' ? 'AI Rewrite Suggestion' : 'AI Summary';
+            
+            let formattedText = text.replace(/\n/g, '<br>');
+            if (mode === 'rewrite') {
+                formattedText = '<ul>' + text.split('\n').map(line => line.trim() ? `<li class="list-disc list-inside mb-2">${line.replace(/^\* /, '')}</li>` : '').join('') + '</ul>';
+            }
+
+            const modalBody = document.getElementById('modal-body');
+            modalBody.innerHTML = `
+                <div class="p-4 bg-gray-50 rounded-lg text-gray-800">${formattedText}</div>
+                <div class="flex justify-end gap-4 mt-6">
+                    <button onclick="hideModal()" class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300">Cancel</button>
+                    <button onclick="replaceContent('${elementId}', \`${text}\`)" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700">Replace Content</button>
+                </div>
+            `;
+        }
+
+        function replaceContent(elementId, newText) {
+            const element = document.getElementById(elementId);
+            if(element) {
+                // Assuming the content to replace is a list of points
+                const points = newText.split('\n').filter(line => line.trim() !== '');
+                const listElement = element.querySelector('ul');
+                if(listElement) {
+                    listElement.innerHTML = points.map(point => `<li class="toggleable">${point.replace(/^\* /, '')}</li>`).join('');
+                } else {
+                    // Fallback for non-list content
+                    element.innerHTML = newText.replace(/\n/g, '<br>');
+                }
+            }
+            hideModal();
+        }
+
+        // --- INITIALIZATION ---
+        // Fill in missing data for a complete example
+        resumeData.sections[2].items = [
+            { "title": "Cubesat", "organization": "University Clinic Project", "points": ["School project to develop CubeSat for testing novel memory technologies against radioactivity in space environments", "Led Command & Data Handling to develop software core"] },
+            { "title": "Typedoc Neo Theme", "organization": "Open Source Project at Google", "points": ["Created & published new open source theme with readability improvements", "Project averages > 5K weekly downloads, adopted for Yarn reference docs"] }
+        ];
+        resumeData.sections[4].items = [
+            { "title": "Languages", "points": ["Java, JavaScript, TypeScript, C, C++, Golang, Dart, HTML, Python"] },
+            { "title": "Frameworks", "points": ["Node.js, Angular, jQuery, Bootstrap, Polymer, Flask"] }
+        ];
+         resumeData.sections[5].items = [
+            { "title": "Hour of Code", "points": ["Lead coding exercises at elementary schools"] },
+            { "title": "IEEE, New York Section", "date": "Feb 2020-Present", "points": ["Young Professionals, Vice Chair"] }
+        ];
+
+        renderResume();
+    </script>
+</body>
+</html>
