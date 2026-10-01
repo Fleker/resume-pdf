@@ -138,7 +138,7 @@
                     { "type": "location", "value": "New York, NY", "icon": "map-pin" },
                     { "type": "linkedin", "value": "https://linkedin.com/in/nickfelker", "display": "linkedin.com/in/nickfelker", "icon": "linkedin" },
                     { "type": "website", "value": "https://felker.dev", "display": "felker.dev", "icon": "globe" },
-                    { "type": "email", "value": "nickfelker@gmail.com", "display": "@nickfelker@gmail.com", "icon": "mail" },
+                    { "type": "email", "value": "nickfelker@gmail.com", "display": "nickfelker@gmail.com", "icon": "mail" },
                     { "type": "github", "value": "https://github.com/fleker", "display": "github.com/fleker", "icon": "github" }
                 ]
             },
@@ -152,11 +152,13 @@
                             "date": "November 2021 - Present",
                             "location": "New York, NY",
                             "points": [
+                                "Drove technical architecture, cross-functional launch readiness, and engineering mentorship across distributed teams and external partner integrations",
                                 "Built third-party service provider integration and account-linking platform with OAuth and cryptographic verification",
                                 "Led full-stack development of post-purchase customer review integrations, checkout extensions, and merchant recommendations",
-                                "Integrated automated fraud and trust validation into merchant onboarding, significantly reducing spam ad impressions",
+                                "Standardized backend RPC error handling and built AI agent workflows for incident triage, cutting on-call alert noise by ~70%",
+                                "Integrated automated fraud and trust validation into merchant onboarding, reducing spam ad impressions by ~45%",
                                 "Developed merchant onboarding and storefront integration flows for conversational AI shopping assistants",
-                                "Standardized backend RPC error handling and built AI agent workflows for incident triage, substantially reducing on-call alert noise",
+                                "Optimized memory footprint and scheduling for daily background synchronization jobs",
                                 "Led cross-team dependency upgrades to remediate critical security vulnerabilities and decommissioned legacy API versions",
                                 "Relaunched Shopify integration which tripled positive merchant sentiment",
                                 "Built platform to streamline API transformations with AI",
@@ -179,7 +181,7 @@
                 {
                     "title": "ACHIEVEMENTS",
                     "items": [
-                        { "title": "First Place at PennApps", "points": ["Part of a team that developed skin-safe tattoo capacitive touch sensors, winning first place at world's largest univerisity hackathon."], "icon": "award" },
+                        { "title": "First Place at PennApps", "points": ["Part of a team that developed skin-safe tattoo capacitive touch sensors, winning first place at world's largest university hackathon."], "icon": "award" },
                         { "title": "Best Design Award", "points": ["Built nutrition check-in Android app with ML-based camera scanner"], "icon": "layout-template" },
                         { "title": "Eagle Scout", "icon": "life-buoy" },
                         { "title": "Intellectual Property Award", "points": ["Filed ten defensive publications on machine learning applications"], "icon": "lightbulb" }
@@ -254,7 +256,7 @@
                         ${section.items.map(item => `
                             <div class="mb-3 toggleable">
                                 <h3 class="font-semibold text-md flex items-center gap-2">${item.icon ? `<i data-lucide="${item.icon}" class="w-4 h-4 text-green-600"></i>` : ''}${item.title}</h3>
-                                ${item.points && item.points.length > 0 ? `<p class="text-sm text-gray-700 pl-6">${item.points.map(point => `<span class="toggleable">${point}</span>`).join('')}</p>` : ''}
+                                ${item.points && item.points.length > 0 ? `<p class="text-sm text-gray-700 pl-6">${item.points.map((point, idx) => `<span class="toggleable">${point}${section.title === 'SKILLS' && idx < item.points.length - 1 ? ',' : ''}</span>`).join(' ')}</p>` : ''}
                             </div>`).join('')}
                     </div>
                 </section>`;
@@ -305,9 +307,9 @@
             { "title": "Cyanobyte", "organization": "Embedded Software Project", "points": ["Use AI to turn datasheets into structured machine-readable data", "Use templates to turn datasheets into firmware driver"]},
         ];
         resumeData.sections[4].items = [
-            { "title": "Languages", "points": ["Java", "JavaScript", "TypeScript", "C", "C++", "Golang", "Dart", "HTML", "Python", "PHP", "SQL"] },
+            { "title": "Languages", "points": ["Java", "JavaScript", "TypeScript", "C", "C++", "Golang", "Dart", "HTML", "Python", "PHP"] },
             { "title": "Frameworks", "points": ["Node.js", "Angular", "jQuery", "Bootstrap", "Polymer", "Flask", "Vue.js", "AngularDart", "Obsidian"] },
-            { "title": "Technology", "points": ["Arduino", "ESP32", "Smart Home", "Chisel", "FPGAs", "LLMs", "AI Agents", "MCP", "GraphQL"] },
+            { "title": "Technology", "points": ["Arduino", "ESP32", "Smart Home", "Chisel", "FPGAs", "LLMs", "AI Agents", "MCP"] },
         ];
          resumeData.sections[5].items = [
             { "title": "Hour of Code", "points": ["Lead coding exercises at elementary schools"] },
